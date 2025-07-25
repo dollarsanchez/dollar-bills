@@ -1,5 +1,5 @@
-import { User, Edit2, Trash2 } from 'lucide-react';
-import { Person } from '../types';
+import { User, Edit2, Trash2 } from "lucide-react";
+import { Person } from "../types";
 
 interface PersonCardProps {
   person: Person;
@@ -7,7 +7,11 @@ interface PersonCardProps {
   onDelete: () => void;
 }
 
-export default function PersonCard({ person, onEdit, onDelete }: PersonCardProps) {
+export default function PersonCard({
+  person,
+  onEdit,
+  onDelete,
+}: PersonCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 card-hover group">
       <div className="flex items-center justify-between">
@@ -20,7 +24,7 @@ export default function PersonCard({ person, onEdit, onDelete }: PersonCardProps
             <p className="text-sm text-gray-500">สมาชิกในปาร์ตี้</p>
           </div>
         </div>
-        
+
         <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={onEdit}
