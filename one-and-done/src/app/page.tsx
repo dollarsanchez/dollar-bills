@@ -21,6 +21,11 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [currentView, setCurrentView] = useState<ViewType>('main');
   
+  // Onboarding states
+  const [isFirstTime, setIsFirstTime] = useLocalStorage<boolean>('billSplitter_firstTime', true);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showHostReminder, setShowHostReminder] = useState(false);
+  
   // Modal states
   const [showPersonModal, setShowPersonModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
@@ -43,6 +48,13 @@ export default function Home() {
     details: ''
   });
 
+  // Check if first time user
+  useEffect(() => {
+    if (isFirstTime && people.length === 0 && items.length === 0) {
+      setShowWelcome(true);
+    }
+  }, [isFirstTime, people.length, items.length]);
+
   // Person management
   const handleAddPerson = (name: string) => {
     if (editingPerson) {
@@ -54,6 +66,17 @@ export default function Home() {
         name
       };
       setPeople([...people, newPerson]);
+      
+      // Show host reminder if this is the first person or no host is set
+      if (people.length === 0 || !hostId) {
+        setShowHostReminder(true);
+        setTimeout(() => setShowHostReminder(false), 5000);
+      }
+    }
+    
+    // Mark as not first time after adding first person
+    if (isFirstTime) {
+      setIsFirstTime(false);
     }
   };
 
@@ -257,6 +280,11 @@ export default function Home() {
     setEditingPerson(null);
     setEditingItem(null);
     setSelectedPeople([]);
+  };
+
+  const handleWelcomeClose = () => {
+    setShowWelcome(false);
+    setIsFirstTime(false);
   };
 
   // Summary View
@@ -505,6 +533,19 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              {/* First Time User Hint */}
+              {isFirstTime && (
+                <div className="animate-pulse-slow">
+                  <button
+                    onClick={() => setShowHelpModal(true)}
+                    className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg text-sm font-medium shadow-lg"
+                  >
+                    <span>👋</span>
+                    <span>ครั้งแรก? คลิกที่นี่!</span>
+                  </button>
+                </div>
+              )}
+              
               <button
                 onClick={() => setShowHelpModal(true)}
                 className="p-2 glass-dark rounded-lg transition-colors hover:bg-white/10"
@@ -576,6 +617,21 @@ export default function Home() {
                 {people.length}
               </span>
             </div>
+            
+            {/* Host Reminder */}
+            {showHostReminder && (
+              <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 animate-fade-in-scale">
+                <div className="flex items-center space-x-2">
+                  <Crown className="w-4 h-4 text-yellow-400" />
+                  <p className="text-sm text-yellow-300 font-medium">
+                    💡 อย่าลืมกำหนด Host (คนจ่าย) ด้วยนะ!
+                  </p>
+                </div>
+                <p className="text-xs text-yellow-400 mt-1">
+                  กดปุ่ม 👑 เพื่อตั้งเป็นคนที่จ่ายเงินให้ทั้งหมด
+                </p>
+              </div>
+            )}
             
             <div className="flex space-x-2 mb-4">
               <button
@@ -819,6 +875,72 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Welcome Modal for First Time Users */}
+      {showWelcome && (
+        <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 p-4">
+          <div className="glass rounded-2xl p-8 w-full max-w-lg animate-fade-in-scale">
+            <div className="text-center mb-6">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mb-4">
+                <span className="text-2xl">👋</span>
+              </div>
+              <h2 className="text-2xl font-bold gradient-text mb-2">
+                ยินดีต้อนรับสู่ One&Done!
+              </h2>
+              <p className="text-gray-300">
+                เว็บแบ่งจ่ายค่าอาหารและเครื่องดื่มแบบยุติธรรม
+              </p>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center space-x-3 p-3 glass-dark rounded-lg">
+                <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-emerald-400 font-bold">1</span>
+                </div>
+                <div>
+                  <p className="font-medium text-white">เพิ่มคนในปาร์ตี้</p>
+                  <p className="text-xs text-gray-400">รวมตัวคุณเองด้วย</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3 p-3 glass-dark rounded-lg">
+                <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-blue-400 font-bold">2</span>
+                </div>
+                <div>
+                  <p className="font-medium text-white">ตั้งค่า Host (คนจ่าย)</p>
+                  <p className="text-xs text-gray-400">กดปุ่ม 👑 เพื่อตั้งเป็นคนจ่าย</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3 p-3 glass-dark rounded-lg">
+                <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-purple-400 font-bold">3</span>
+                </div>
+                <div>
+                  <p className="font-medium text-white">เพิ่มรายการอาหาร</p>
+                  <p className="text-xs text-gray-400">เลือกคนที่กินแต่ละรายการ</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowHelpModal(true)}
+                className="flex-1 px-4 py-3 glass-dark border border-white/20 text-white rounded-xl hover:bg-white/10 transition-colors"
+              >
+                ดูคู่มือเต็ม
+              </button>
+              <button
+                onClick={handleWelcomeClose}
+                className="flex-1 px-4 py-3 btn-primary text-white rounded-xl font-medium"
+              >
+                เริ่มใช้งาน! 🚀
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modals */}
       <AddPersonModal
         isOpen={showPersonModal}
@@ -858,6 +980,35 @@ export default function Home() {
             </div>
 
             <div className="space-y-6 text-gray-300">
+              {/* Quick Start */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-yellow-400">⚡ เริ่มต้นอย่างรวดเร็ว</h4>
+                <div className="glass-dark rounded-lg p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Users className="w-6 h-6 text-emerald-400" />
+                      </div>
+                      <h5 className="font-semibold text-emerald-400 mb-1">เพิ่มคน</h5>
+                      <p className="text-xs">เพิ่มชื่อทุกคนในกลุ่ม</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Crown className="w-6 h-6 text-yellow-400" />
+                      </div>
+                      <h5 className="font-semibold text-yellow-400 mb-1">ตั้ง Host</h5>
+                      <p className="text-xs">กำหนดคนที่จ่ายเงิน</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Receipt className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <h5 className="font-semibold text-blue-400 mb-1">เพิ่มอาหาร</h5>
+                      <p className="text-xs">บันทึกรายการและราคา</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
               {/* About Section */}
               <div>
                 <h4 className="text-lg font-semibold mb-3 text-emerald-400">📋 เกี่ยวกับ One&Done</h4>
