@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 interface ConfettiPiece {
   id: number;
@@ -18,21 +18,10 @@ interface ConfettiEffectProps {
   duration?: number;
 }
 
-export default function ConfettiEffect({
-  isActive,
-  onComplete,
-  duration = 3000,
-}: ConfettiEffectProps) {
+export default function ConfettiEffect({ isActive, onComplete, duration = 3000 }: ConfettiEffectProps) {
   const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
 
-  const colors = [
-    "#10b981",
-    "#3b82f6",
-    "#8b5cf6",
-    "#f59e0b",
-    "#ef4444",
-    "#06b6d4",
-  ];
+  const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
 
   const createConfettiPiece = (id: number): ConfettiPiece => ({
     id,
@@ -50,9 +39,7 @@ export default function ConfettiEffect({
     if (!isActive) return;
 
     // Create initial confetti burst
-    const initialConfetti = Array.from({ length: 80 }, (_, i) =>
-      createConfettiPiece(i)
-    );
+    const initialConfetti = Array.from({ length: 80 }, (_, i) => createConfettiPiece(i));
     setConfetti(initialConfetti);
 
     let animationFrame: number;
@@ -68,16 +55,16 @@ export default function ConfettiEffect({
         return;
       }
 
-      setConfetti((prevConfetti) =>
+      setConfetti(prevConfetti =>
         prevConfetti
-          .map((piece) => ({
+          .map(piece => ({
             ...piece,
             x: piece.x + piece.vx,
             y: piece.y + piece.vy,
             vy: piece.vy + 0.1, // gravity
             rotation: piece.rotation + piece.rotationSpeed,
           }))
-          .filter((piece) => piece.y < window.innerHeight + 10)
+          .filter(piece => piece.y < window.innerHeight + 10)
       );
 
       animationFrame = requestAnimationFrame(animate);
@@ -96,7 +83,7 @@ export default function ConfettiEffect({
 
   return (
     <div className="fixed inset-0 pointer-events-none z-50">
-      {confetti.map((piece) => (
+      {confetti.map(piece => (
         <div
           key={piece.id}
           className="absolute rounded-full"

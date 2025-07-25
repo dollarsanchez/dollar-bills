@@ -1,6 +1,6 @@
-import { ShoppingCart, Edit2, Trash2, Users } from "lucide-react";
-import { formatCurrency } from "../utils/calculations";
-import { Item, Person } from "../types";
+import { ShoppingCart, Edit2, Trash2, Users } from 'lucide-react';
+import { formatCurrency } from '../utils/calculations';
+import { Item, Person } from '../types';
 
 interface ItemCardProps {
   item: Item;
@@ -9,15 +9,10 @@ interface ItemCardProps {
   onDelete: () => void;
 }
 
-export default function ItemCard({
-  item,
-  people,
-  onEdit,
-  onDelete,
-}: ItemCardProps) {
-  const participantNames = item.participants
-    .map((id) => people.find((person) => person.id === id)?.name)
-    .filter(Boolean);
+export default function ItemCard({ item, people, onEdit, onDelete }: ItemCardProps) {
+  const participantNames = item.participants.map(id => 
+    people.find(person => person.id === id)?.name
+  ).filter(Boolean);
 
   const pricePerPerson = item.price / item.participants.length;
 
@@ -42,7 +37,7 @@ export default function ItemCard({
               <Users className="w-4 h-4" />
               <span>คนละ {formatCurrency(pricePerPerson)}</span>
             </div>
-
+            
             <div className="flex flex-wrap gap-1">
               {participantNames.map((name, index) => (
                 <span
@@ -55,7 +50,7 @@ export default function ItemCard({
             </div>
           </div>
         </div>
-
+        
         <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity ml-4">
           <button
             onClick={onEdit}

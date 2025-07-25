@@ -1,39 +1,21 @@
-import { useState, useEffect } from "react";
-import {
-  X,
-  ShoppingCart,
-  DollarSign,
-  Users,
-  CheckCircle,
-  CreditCard,
-} from "lucide-react";
-import { AddItemModalProps } from "../types";
+import { useState, useEffect } from 'react';
+import { X, ShoppingCart, DollarSign, Users, CheckCircle } from 'lucide-react';
+import { AddItemModalProps } from '../types';
 
-export default function AddItemModal({
-  isOpen,
-  onClose,
-  onAdd,
-  people,
-  editItem = null,
-}: AddItemModalProps) {
-  const [name, setName] = useState<string>(editItem?.name || "");
-  const [price, setPrice] = useState<string>(editItem?.price?.toString() || "");
-  const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
-    editItem?.participants || []
-  );
-  const [paidBy, setPaidBy] = useState<string>(editItem?.paidBy || "");
+export default function AddItemModal({ isOpen, onClose, onAdd, people, editItem = null }: AddItemModalProps) {
+  const [name, setName] = useState<string>(editItem?.name || '');
+  const [price, setPrice] = useState<string>(editItem?.price?.toString() || '');
+  const [selectedParticipants, setSelectedParticipants] = useState<string[]>(editItem?.participants || []);
 
   useEffect(() => {
     if (editItem) {
       setName(editItem.name);
       setPrice(editItem.price.toString());
       setSelectedParticipants(editItem.participants);
-      setPaidBy(editItem.paidBy || "");
     } else {
-      setName("");
-      setPrice("");
+      setName('');
+      setPrice('');
       setSelectedParticipants([]);
-      setPaidBy("");
     }
   }, [editItem]);
 
@@ -43,27 +25,25 @@ export default function AddItemModal({
       onAdd({
         name: name.trim(),
         price: Number(price),
-        participants: selectedParticipants,
-        paidBy: paidBy || undefined,
+        participants: selectedParticipants
       });
-      setName("");
-      setPrice("");
+      setName('');
+      setPrice('');
       setSelectedParticipants([]);
-      setPaidBy("");
       onClose();
     }
   };
 
   const toggleParticipant = (personId: string) => {
-    setSelectedParticipants((prev) =>
+    setSelectedParticipants(prev =>
       prev.includes(personId)
-        ? prev.filter((id) => id !== personId)
+        ? prev.filter(id => id !== personId)
         : [...prev, personId]
     );
   };
 
   const selectAll = () => {
-    setSelectedParticipants(people.map((p) => p.id));
+    setSelectedParticipants(people.map(p => p.id));
   };
 
   const clearAll = () => {
@@ -81,7 +61,7 @@ export default function AddItemModal({
               <ShoppingCart className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-xl font-bold text-white">
-              {editItem ? "แก้ไขรายการ" : "เพิ่มรายการใหม่"}
+              {editItem ? 'แก้ไขรายการ' : 'เพิ่มรายการใหม่'}
             </h2>
           </div>
           <button
@@ -97,10 +77,7 @@ export default function AddItemModal({
           <div className="space-y-6">
             {/* Item Name */}
             <div>
-              <label
-                htmlFor="itemName"
-                className="flex items-center space-x-2 text-sm font-medium text-gray-300 mb-2"
-              >
+              <label htmlFor="itemName" className="flex items-center space-x-2 text-sm font-medium text-gray-300 mb-2">
                 <ShoppingCart className="w-4 h-4" />
                 <span>ชื่อรายการ</span>
               </label>
@@ -117,10 +94,7 @@ export default function AddItemModal({
 
             {/* Price */}
             <div>
-              <label
-                htmlFor="itemPrice"
-                className="flex items-center space-x-2 text-sm font-medium text-gray-300 mb-2"
-              >
+              <label htmlFor="itemPrice" className="flex items-center space-x-2 text-sm font-medium text-gray-300 mb-2">
                 <DollarSign className="w-4 h-4" />
                 <span>ราคา (บาท)</span>
               </label>
@@ -141,7 +115,7 @@ export default function AddItemModal({
               <div className="flex items-center justify-between mb-3">
                 <label className="flex items-center space-x-2 text-sm font-medium text-gray-300">
                   <Users className="w-4 h-4" />
-                  <span>ใครกิน? ({selectedParticipants.length} คน)</span>
+                  <span>ใครจ่าย? ({selectedParticipants.length} คน)</span>
                 </label>
                 <div className="flex space-x-2">
                   <button
@@ -175,17 +149,15 @@ export default function AddItemModal({
                       onClick={() => toggleParticipant(person.id)}
                       className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all ${
                         selectedParticipants.includes(person.id)
-                          ? "person-selected"
-                          : "person-unselected hover:bg-white/10"
+                          ? 'person-selected'
+                          : 'person-unselected hover:bg-white/10'
                       }`}
                     >
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                          selectedParticipants.includes(person.id)
-                            ? "bg-white border-white"
-                            : "border-white/40"
-                        }`}
-                      >
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        selectedParticipants.includes(person.id)
+                          ? 'bg-white border-white'
+                          : 'border-white/40'
+                      }`}>
                         {selectedParticipants.includes(person.id) && (
                           <CheckCircle className="w-3 h-3 text-blue-500" />
                         )}
@@ -197,46 +169,6 @@ export default function AddItemModal({
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Who Paid */}
-            <div>
-              <label className="flex items-center space-x-2 text-sm font-medium text-gray-300 mb-2">
-                <CreditCard className="w-4 h-4" />
-                <span>ใครจ่าย? (ไม่บังคับ)</span>
-              </label>
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setPaidBy("")}
-                  className={`w-full p-3 rounded-xl text-left transition-all ${
-                    paidBy === ""
-                      ? "bg-gray-500/20 border-2 border-gray-400"
-                      : "person-unselected hover:bg-white/10"
-                  }`}
-                >
-                  <span className="text-gray-300">ไม่ระบุ (แบ่งกันจ่าย)</span>
-                </button>
-                {people.map((person) => (
-                  <button
-                    key={person.id}
-                    type="button"
-                    onClick={() => setPaidBy(person.id)}
-                    className={`w-full flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all ${
-                      paidBy === person.id
-                        ? "person-selected"
-                        : "person-unselected hover:bg-white/10"
-                    }`}
-                  >
-                    <div className="w-6 h-6 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
-                        {person.name.charAt(0)}
-                      </span>
-                    </div>
-                    <span className="font-medium">{person.name} จ่าย</span>
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
 
@@ -250,12 +182,10 @@ export default function AddItemModal({
             </button>
             <button
               type="submit"
-              disabled={
-                !name.trim() || !price || selectedParticipants.length === 0
-              }
+              disabled={!name.trim() || !price || selectedParticipants.length === 0}
               className="flex-1 px-4 py-3 btn-primary text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
             >
-              {editItem ? "อัพเดท" : "เพิ่ม"}
+              {editItem ? 'อัพเดท' : 'เพิ่ม'}
             </button>
           </div>
         </form>

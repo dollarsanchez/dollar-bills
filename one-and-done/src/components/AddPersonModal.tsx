@@ -1,20 +1,15 @@
-import { useState, useEffect } from "react";
-import { X, User, UserPlus } from "lucide-react";
-import { AddPersonModalProps } from "../types";
+import { useState, useEffect } from 'react';
+import { X, User, UserPlus } from 'lucide-react';
+import { AddPersonModalProps } from '../types';
 
-export default function AddPersonModal({
-  isOpen,
-  onClose,
-  onAdd,
-  editPerson = null,
-}: AddPersonModalProps) {
-  const [name, setName] = useState<string>(editPerson?.name || "");
+export default function AddPersonModal({ isOpen, onClose, onAdd, editPerson = null }: AddPersonModalProps) {
+  const [name, setName] = useState<string>(editPerson?.name || '');
 
   useEffect(() => {
     if (editPerson) {
       setName(editPerson.name);
     } else {
-      setName("");
+      setName('');
     }
   }, [editPerson]);
 
@@ -22,7 +17,7 @@ export default function AddPersonModal({
     e.preventDefault();
     if (name.trim()) {
       onAdd(name.trim());
-      setName("");
+      setName('');
       onClose();
     }
   };
@@ -35,14 +30,10 @@ export default function AddPersonModal({
         <div className="flex items-center justify-between p-6 border-b border-white/20">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-lg">
-              {editPerson ? (
-                <User className="w-5 h-5 text-white" />
-              ) : (
-                <UserPlus className="w-5 h-5 text-white" />
-              )}
+              {editPerson ? <User className="w-5 h-5 text-white" /> : <UserPlus className="w-5 h-5 text-white" />}
             </div>
             <h2 className="text-xl font-bold text-white">
-              {editPerson ? "แก้ไขชื่อคน" : "เพิ่มคนใหม่"}
+              {editPerson ? 'แก้ไขชื่อคน' : 'เพิ่มคนใหม่'}
             </h2>
           </div>
           <button
@@ -57,10 +48,7 @@ export default function AddPersonModal({
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
             <div>
-              <label
-                htmlFor="personName"
-                className="block text-sm font-medium text-gray-300 mb-2"
-              >
+              <label htmlFor="personName" className="block text-sm font-medium text-gray-300 mb-2">
                 ชื่อ
               </label>
               <input
@@ -88,7 +76,7 @@ export default function AddPersonModal({
               disabled={!name.trim()}
               className="flex-1 px-4 py-3 btn-primary text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
             >
-              {editPerson ? "อัพเดท" : "เพิ่ม"}
+              {editPerson ? 'อัพเดท' : 'เพิ่ม'}
             </button>
           </div>
         </form>
