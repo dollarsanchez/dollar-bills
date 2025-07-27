@@ -1,52 +1,90 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { 
-  UserPlus, Plus, RefreshCw, Trash2, Calculator, Receipt, Share2, Download, 
-  CheckCircle, ArrowLeft, Camera, CreditCard, Smartphone, Building2, QrCode, 
-  Eye, Upload, Crown, HelpCircle, X, Edit3, Users, Minus
-} from 'lucide-react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { generateId } from '../utils/calculations';
-import { Person, Item, ViewType, HostPaymentMethod, BillSummary } from '../types';
+import { useState, useEffect } from "react";
+import {
+  UserPlus,
+  Plus,
+  RefreshCw,
+  Trash2,
+  Calculator,
+  Receipt,
+  Share2,
+  Download,
+  CheckCircle,
+  ArrowLeft,
+  Camera,
+  CreditCard,
+  Smartphone,
+  Building2,
+  QrCode,
+  Eye,
+  Upload,
+  Crown,
+  HelpCircle,
+  X,
+  Edit3,
+  Users,
+  Minus,
+} from "lucide-react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { generateId } from "../utils/calculations";
+import {
+  Person,
+  Item,
+  ViewType,
+  HostPaymentMethod,
+  BillSummary,
+} from "../types";
 
 // Components
-import AddPersonModal from '../components/AddPersonModal';
-import AddItemModal from '../components/AddItemModal';
+import AddPersonModal from "../components/AddPersonModal";
+import AddItemModal from "../components/AddItemModal";
 
 export default function Home() {
   // Main state
-  const [people, setPeople] = useLocalStorage<Person[]>('billSplitter_people', []);
-  const [items, setItems] = useLocalStorage<Item[]>('billSplitter_foods', []);
+  const [people, setPeople] = useLocalStorage<Person[]>(
+    "billSplitter_people",
+    []
+  );
+  const [items, setItems] = useLocalStorage<Item[]>("billSplitter_foods", []);
   const [darkMode, setDarkMode] = useState(false);
-  const [currentView, setCurrentView] = useState<ViewType>('main');
-  
+  const [currentView, setCurrentView] = useState<ViewType>("main");
+
   // Onboarding states
-  const [isFirstTime, setIsFirstTime] = useLocalStorage<boolean>('billSplitter_firstTime', true);
+  const [isFirstTime, setIsFirstTime] = useLocalStorage<boolean>(
+    "billSplitter_firstTime",
+    true
+  );
   const [showWelcome, setShowWelcome] = useState(false);
   const [showHostReminder, setShowHostReminder] = useState(false);
-  
+
   // Modal states
   const [showPersonModal, setShowPersonModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showHostPaymentModal, setShowHostPaymentModal] = useState(false);
-  
+
   // Edit states
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
-  
+
   // Selection states
   const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
-  const [selectedPersonSummary, setSelectedPersonSummary] = useState<string | null>(null);
-  
+  const [selectedPersonSummary, setSelectedPersonSummary] = useState<
+    string | null
+  >(null);
+
   // Host/Payment states
-  const [hostId, setHostId] = useLocalStorage<string | null>('billSplitter_hostId', null);
-  const [hostPaymentMethod, setHostPaymentMethod] = useLocalStorage<HostPaymentMethod>('billSplitter_hostPaymentMethod', {
-    type: 'qrcode',
-    image: null,
-    details: ''
-  });
+  const [hostId, setHostId] = useLocalStorage<string | null>(
+    "billSplitter_hostId",
+    null
+  );
+  const [hostPaymentMethod, setHostPaymentMethod] =
+    useLocalStorage<HostPaymentMethod>("billSplitter_hostPaymentMethod", {
+      type: "qrcode",
+      image: null,
+      details: "",
+    });
 
   // Check if first time user
   useEffect(() => {
@@ -58,22 +96,24 @@ export default function Home() {
   // Person management
   const handleAddPerson = (name: string) => {
     if (editingPerson) {
-      setPeople(people.map(p => p.id === editingPerson.id ? { ...p, name } : p));
+      setPeople(
+        people.map((p) => (p.id === editingPerson.id ? { ...p, name } : p))
+      );
       setEditingPerson(null);
     } else {
       const newPerson: Person = {
         id: generateId(),
-        name
+        name,
       };
       setPeople([...people, newPerson]);
-      
+
       // Show host reminder if this is the first person or no host is set
       if (people.length === 0 || !hostId) {
         setShowHostReminder(true);
         setTimeout(() => setShowHostReminder(false), 5000);
       }
     }
-    
+
     // Mark as not first time after adding first person
     if (isFirstTime) {
       setIsFirstTime(false);
@@ -86,13 +126,19 @@ export default function Home() {
   };
 
   const handleDeletePerson = (personId: string) => {
-    if (confirm('แน่ใจหรือไม่ที่จะลบคนนี้? รายการที่เกี่ยวข้องจะถูกลบออกด้วย')) {
-      setPeople(people.filter(p => p.id !== personId));
-      setItems(items.map(item => ({
-        ...item,
-        participants: item.participants.filter(pid => pid !== personId)
-      })).filter(item => item.participants.length > 0));
-      
+    if (
+      confirm("แน่ใจหรือไม่ที่จะลบคนนี้? รายการที่เกี่ยวข้องจะถูกลบออกด้วย")
+    ) {
+      setPeople(people.filter((p) => p.id !== personId));
+      setItems(
+        items
+          .map((item) => ({
+            ...item,
+            participants: item.participants.filter((pid) => pid !== personId),
+          }))
+          .filter((item) => item.participants.length > 0)
+      );
+
       if (hostId === personId) {
         setHostId(null);
       }
@@ -100,16 +146,18 @@ export default function Home() {
   };
 
   // Item management
-  const handleAddItem = (itemData: Omit<Item, 'id'>) => {
+  const handleAddItem = (itemData: Omit<Item, "id">) => {
     if (editingItem) {
-      setItems(items.map(item => 
-        item.id === editingItem.id ? { ...editingItem, ...itemData } : item
-      ));
+      setItems(
+        items.map((item) =>
+          item.id === editingItem.id ? { ...editingItem, ...itemData } : item
+        )
+      );
       setEditingItem(null);
     } else {
       const newItem: Item = {
         id: generateId(),
-        ...itemData
+        ...itemData,
       };
       setItems([...items, newItem]);
     }
@@ -123,32 +171,32 @@ export default function Home() {
   };
 
   const handleDeleteItem = (itemId: string) => {
-    if (confirm('แน่ใจหรือไม่ที่จะลบรายการนี้?')) {
-      setItems(items.filter(item => item.id !== itemId));
+    if (confirm("แน่ใจหรือไม่ที่จะลบรายการนี้?")) {
+      setItems(items.filter((item) => item.id !== itemId));
     }
   };
 
   // Calculate bill summary
   const calculateBillSummary = (): BillSummary => {
     const billSummary: BillSummary = {};
-    
-    people.forEach(person => {
+
+    people.forEach((person) => {
       billSummary[person.id] = {
         name: person.name,
         items: [],
-        total: 0
+        total: 0,
       };
     });
 
-    items.forEach(item => {
+    items.forEach((item) => {
       const pricePerPerson = item.price / item.participants.length;
-      item.participants.forEach(personId => {
+      item.participants.forEach((personId) => {
         if (billSummary[personId]) {
           billSummary[personId].items.push({
             name: item.name,
             price: pricePerPerson,
             totalPrice: item.price,
-            sharedWith: item.participants.length
+            sharedWith: item.participants.length,
           });
           billSummary[personId].total += pricePerPerson;
         }
@@ -163,15 +211,15 @@ export default function Home() {
 
   // Selection helpers
   const togglePersonSelection = (personId: string) => {
-    setSelectedPeople(prev => 
-      prev.includes(personId) 
-        ? prev.filter(id => id !== personId)
+    setSelectedPeople((prev) =>
+      prev.includes(personId)
+        ? prev.filter((id) => id !== personId)
         : [...prev, personId]
     );
   };
 
   const selectAllPeople = () => {
-    setSelectedPeople(people.map(p => p.id));
+    setSelectedPeople(people.map((p) => p.id));
   };
 
   const clearSelectedPeople = () => {
@@ -180,17 +228,17 @@ export default function Home() {
 
   // Clear functions
   const clearAll = () => {
-    if (confirm('คุณต้องการลบข้อมูลทั้งหมดใช่ไหม?')) {
+    if (confirm("คุณต้องการลบข้อมูลทั้งหมดใช่ไหม?")) {
       setPeople([]);
       setItems([]);
       setSelectedPeople([]);
       setHostId(null);
-      setHostPaymentMethod({ type: 'qrcode', image: null, details: '' });
+      setHostPaymentMethod({ type: "qrcode", image: null, details: "" });
     }
   };
 
   const clearPeople = () => {
-    if (confirm('คุณต้องการลบคนทั้งหมดใช่ไหม?')) {
+    if (confirm("คุณต้องการลบคนทั้งหมดใช่ไหม?")) {
       setPeople([]);
       setItems([]);
       setSelectedPeople([]);
@@ -199,31 +247,10 @@ export default function Home() {
   };
 
   const clearFoods = () => {
-    if (confirm('คุณต้องการลบอาหารทั้งหมดใช่ไหม?')) {
+    if (confirm("คุณต้องการลบอาหารทั้งหมดใช่ไหม?")) {
       setItems([]);
       setSelectedPeople([]);
     }
-  };
-
-  // Export data
-  const exportData = () => {
-    const data = {
-      people,
-      foods: items,
-      billSummary: calculateBillSummary(),
-      totalBill,
-      hostId,
-      hostPaymentMethod,
-      timestamp: new Date().toISOString()
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `one-and-done-bill-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   // Payment method helpers
@@ -234,7 +261,7 @@ export default function Home() {
       reader.onload = (e) => {
         setHostPaymentMethod({
           ...hostPaymentMethod,
-          image: e.target?.result as string
+          image: e.target?.result as string,
         });
       };
       reader.readAsDataURL(file);
@@ -253,24 +280,32 @@ export default function Home() {
 
   const viewPersonSummary = (personId: string) => {
     setSelectedPersonSummary(personId);
-    setCurrentView('summary');
+    setCurrentView("summary");
   };
 
   const getPaymentIcon = (type: string) => {
     switch (type) {
-      case 'qrcode': return <QrCode className="w-4 h-4" />;
-      case 'promptpay': return <Smartphone className="w-4 h-4" />;
-      case 'bank': return <Building2 className="w-4 h-4" />;
-      default: return <CreditCard className="w-4 h-4" />;
+      case "qrcode":
+        return <QrCode className="w-4 h-4" />;
+      case "promptpay":
+        return <Smartphone className="w-4 h-4" />;
+      case "bank":
+        return <Building2 className="w-4 h-4" />;
+      default:
+        return <CreditCard className="w-4 h-4" />;
     }
   };
 
   const getPaymentTypeText = (type: string) => {
     switch (type) {
-      case 'qrcode': return 'QR Code';
-      case 'promptpay': return 'PromptPay';
-      case 'bank': return 'Bank Account';
-      default: return 'อื่นๆ';
+      case "qrcode":
+        return "QR Code";
+      case "promptpay":
+        return "PromptPay";
+      case "bank":
+        return "Bank Account";
+      default:
+        return "อื่นๆ";
     }
   };
 
@@ -288,22 +323,26 @@ export default function Home() {
   };
 
   // Summary View
-  if (currentView === 'summary' && selectedPersonSummary) {
-    const person = people.find(p => p.id === selectedPersonSummary);
+  if (currentView === "summary" && selectedPersonSummary) {
+    const person = people.find((p) => p.id === selectedPersonSummary);
     const personBill = billSummary[selectedPersonSummary];
-    const hostPerson = people.find(p => p.id === hostId || '');
+    const hostPerson = people.find((p) => p.id === hostId || "");
 
     return (
-      <div className={`min-h-screen transition-colors duration-300 ${
-        darkMode ? 'bg-slate-900 text-white' : 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white'
-      }`}>
+      <div
+        className={`min-h-screen transition-colors duration-300 ${
+          darkMode
+            ? "bg-slate-900 text-white"
+            : "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white"
+        }`}
+      >
         {/* Header */}
         <div className="glass border-b sticky top-0 z-10 mb-8">
           <div className="max-w-4xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => {
-                  setCurrentView('main');
+                  setCurrentView("main");
                   setSelectedPersonSummary(null);
                 }}
                 className="flex items-center space-x-2 text-emerald-400 hover:text-emerald-300 transition-colors"
@@ -329,7 +368,7 @@ export default function Home() {
                 <div className="text-right">
                   <p className="text-sm text-gray-300">ยอดที่ต้องจ่าย</p>
                   <p className="text-2xl font-bold text-red-400">
-                    ฿{personBill?.total.toFixed(2) || '0.00'}
+                    ฿{personBill?.total.toFixed(2) || "0.00"}
                   </p>
                   {hostPerson && (
                     <p className="text-xs text-gray-400">
@@ -373,7 +412,9 @@ export default function Home() {
                     onClick={() => setShowHostPaymentModal(true)}
                     className="btn-primary px-4 py-2 text-white rounded-lg text-sm"
                   >
-                    {hostPaymentMethod.image || hostPaymentMethod.details ? 'แก้ไข' : 'เพิ่ม'}
+                    {hostPaymentMethod.image || hostPaymentMethod.details
+                      ? "แก้ไข"
+                      : "เพิ่ม"}
                   </button>
                 )}
               </div>
@@ -384,12 +425,16 @@ export default function Home() {
                     <div className="glass-dark rounded-lg p-4 border border-yellow-500/30">
                       <div className="text-center">
                         <div className="text-yellow-400 text-2xl mb-2">👑</div>
-                        <h3 className="font-semibold text-yellow-400">คุณเป็นคนจ่าย</h3>
-                        <p className="text-sm text-gray-300">คนอื่นจะจ่ายเงินให้คุณ</p>
+                        <h3 className="font-semibold text-yellow-400">
+                          คุณเป็นคนจ่าย
+                        </h3>
+                        <p className="text-sm text-gray-300">
+                          คนอื่นจะจ่ายเงินให้คุณ
+                        </p>
                       </div>
                     </div>
 
-                    {(hostPaymentMethod.image || hostPaymentMethod.details) ? (
+                    {hostPaymentMethod.image || hostPaymentMethod.details ? (
                       <div className="glass-dark rounded-lg p-4">
                         <div className="flex items-center space-x-2 mb-2">
                           {getPaymentIcon(hostPaymentMethod.type)}
@@ -397,20 +442,22 @@ export default function Home() {
                             {getPaymentTypeText(hostPaymentMethod.type)}
                           </span>
                         </div>
-                        
+
                         {hostPaymentMethod.image && (
                           <div className="mt-3">
-                            <img 
-                              src={hostPaymentMethod.image} 
-                              alt="Payment QR Code" 
+                            <img
+                              src={hostPaymentMethod.image}
+                              alt="Payment QR Code"
                               className="w-full max-w-xs mx-auto rounded-lg border border-white/20"
                             />
                           </div>
                         )}
-                        
+
                         {hostPaymentMethod.details && (
                           <div className="mt-3">
-                            <p className="text-sm text-gray-300 mb-1">รายละเอียด:</p>
+                            <p className="text-sm text-gray-300 mb-1">
+                              รายละเอียด:
+                            </p>
                             <p className="font-mono text-sm bg-black/30 p-2 rounded mt-1">
                               {hostPaymentMethod.details}
                             </p>
@@ -452,20 +499,22 @@ export default function Home() {
                             {getPaymentTypeText(hostPaymentMethod.type)}
                           </span>
                         </div>
-                        
+
                         {hostPaymentMethod.image && (
                           <div className="mt-3">
-                            <img 
-                              src={hostPaymentMethod.image} 
-                              alt="Payment QR Code" 
+                            <img
+                              src={hostPaymentMethod.image}
+                              alt="Payment QR Code"
                               className="w-full max-w-xs mx-auto rounded-lg border border-white/20"
                             />
                           </div>
                         )}
-                        
+
                         {hostPaymentMethod.details && (
                           <div className="mt-3">
-                            <p className="text-sm text-gray-300 mb-1">รายละเอียด:</p>
+                            <p className="text-sm text-gray-300 mb-1">
+                              รายละเอียด:
+                            </p>
                             <p className="font-mono text-sm bg-black/30 p-2 rounded mt-1">
                               {hostPaymentMethod.details}
                             </p>
@@ -475,9 +524,15 @@ export default function Home() {
                         <div className="flex space-x-2 mt-4">
                           <button
                             onClick={() => {
-                              const text = `ชำระเงินให้ ${hostPerson.name}\nจำนวน: ฿${personBill?.total.toFixed(2)}\n${hostPaymentMethod.details ? `รายละเอียด: ${hostPaymentMethod.details}` : ''}`;
+                              const text = `ชำระเงินให้ ${
+                                hostPerson.name
+                              }\nจำนวน: ฿${personBill?.total.toFixed(2)}\n${
+                                hostPaymentMethod.details
+                                  ? `รายละเอียด: ${hostPaymentMethod.details}`
+                                  : ""
+                              }`;
                               navigator.clipboard.writeText(text);
-                              alert('คัดลอกข้อมูลแล้ว!');
+                              alert("คัดลอกข้อมูลแล้ว!");
                             }}
                             className="flex-1 btn-primary px-4 py-2 text-white rounded-lg text-sm"
                           >
@@ -486,7 +541,7 @@ export default function Home() {
                           {hostPaymentMethod.image && (
                             <button
                               onClick={() => {
-                                const link = document.createElement('a');
+                                const link = document.createElement("a");
                                 link.download = `payment-${hostPerson.name}.png`;
                                 link.href = hostPaymentMethod.image!;
                                 link.click();
@@ -516,9 +571,13 @@ export default function Home() {
 
   // Main View
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      darkMode ? 'bg-slate-900 text-white' : 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white'
-    }`}>
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        darkMode
+          ? "bg-slate-900 text-white"
+          : "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white"
+      }`}
+    >
       {/* Header */}
       <div className="glass border-b sticky top-0 z-10 mb-8">
         <div className="max-w-6xl mx-auto px-4 py-4">
@@ -545,7 +604,7 @@ export default function Home() {
                   </button>
                 </div>
               )}
-              
+
               <button
                 onClick={() => setShowHelpModal(true)}
                 className="p-2 glass-dark rounded-lg transition-colors hover:bg-white/10"
@@ -557,26 +616,29 @@ export default function Home() {
                 onClick={() => setDarkMode(!darkMode)}
                 className="p-2 glass-dark rounded-lg transition-colors hover:bg-white/10"
               >
-                {darkMode ? '🌙' : '☀️'}
+                {darkMode ? "🌙" : "☀️"}
               </button>
-              <button
-                onClick={exportData}
-                className="flex items-center space-x-2 btn-primary px-4 py-2 text-white rounded-lg"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export</span>
-              </button>
-              
+
               {/* Clear Buttons Dropdown */}
               <div className="relative group">
                 <button className="flex items-center space-x-2 btn-danger px-4 py-2 text-white rounded-lg">
                   <Trash2 className="w-4 h-4" />
                   <span>Clear</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
-                
+
                 <div className="absolute right-0 top-full mt-1 w-48 glass rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <button
                     onClick={clearPeople}
@@ -617,7 +679,7 @@ export default function Home() {
                 {people.length}
               </span>
             </div>
-            
+
             {/* Host Reminder */}
             {showHostReminder && (
               <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 animate-fade-in-scale">
@@ -632,7 +694,7 @@ export default function Home() {
                 </p>
               </div>
             )}
-            
+
             <div className="flex space-x-2 mb-4">
               <button
                 onClick={() => setShowPersonModal(true)}
@@ -644,10 +706,13 @@ export default function Home() {
             </div>
 
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {people.map(person => (
-                <div key={person.id} className={`flex items-center justify-between p-3 glass-dark rounded-lg transition-all card-hover ${
-                  hostId === person.id ? 'ring-2 ring-yellow-400/50' : ''
-                }`}>
+              {people.map((person) => (
+                <div
+                  key={person.id}
+                  className={`flex items-center justify-between p-3 glass-dark rounded-lg transition-all card-hover ${
+                    hostId === person.id ? "ring-2 ring-yellow-400/50" : ""
+                  }`}
+                >
                   <div className="flex items-center space-x-2 flex-1">
                     {hostId === person.id && (
                       <span className="host-badge">HOST</span>
@@ -658,9 +723,9 @@ export default function Home() {
                     <button
                       onClick={() => setHost(person.id)}
                       className={`p-1 rounded transition-colors ${
-                        hostId === person.id 
-                          ? 'text-yellow-400 bg-yellow-400/20' 
-                          : 'hover:bg-white/10'
+                        hostId === person.id
+                          ? "text-yellow-400 bg-yellow-400/20"
+                          : "hover:bg-white/10"
                       }`}
                       title="ตั้งเป็นคนจ่าย"
                     >
@@ -705,12 +770,17 @@ export default function Home() {
                     onClick={() => setShowHostPaymentModal(true)}
                     className="text-xs px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded transition-colors"
                   >
-                    {hostPaymentMethod.image || hostPaymentMethod.details ? 'แก้ไข' : 'ตั้งค่า'}
+                    {hostPaymentMethod.image || hostPaymentMethod.details
+                      ? "แก้ไข"
+                      : "ตั้งค่า"}
                   </button>
                 </div>
                 {(hostPaymentMethod.image || hostPaymentMethod.details) && (
                   <div className="text-xs text-gray-400">
-                    <p>✅ ตั้งค่าแล้ว ({getPaymentTypeText(hostPaymentMethod.type)})</p>
+                    <p>
+                      ✅ ตั้งค่าแล้ว (
+                      {getPaymentTypeText(hostPaymentMethod.type)})
+                    </p>
                   </div>
                 )}
               </div>
@@ -738,8 +808,11 @@ export default function Home() {
 
             {/* Food List */}
             <div className="space-y-2 max-h-80 overflow-y-auto">
-              {items.map(item => (
-                <div key={item.id} className="glass-dark rounded-lg p-3 card-hover">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="glass-dark rounded-lg p-3 card-hover"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">{item.name}</h3>
                     <div className="flex space-x-1">
@@ -759,11 +832,15 @@ export default function Home() {
                   </div>
                   <div className="text-sm text-gray-300">
                     <p>ราคา: ฿{item.price.toFixed(2)}</p>
-                    <p>หารกัน {item.participants.length} คน: {
-                      item.participants.map(id => people.find(p => p.id === id)?.name).join(', ')
-                    }</p>
+                    <p>
+                      หารกัน {item.participants.length} คน:{" "}
+                      {item.participants
+                        .map((id) => people.find((p) => p.id === id)?.name)
+                        .join(", ")}
+                    </p>
                     <p className="text-emerald-400 font-medium">
-                      คนละ: ฿{(item.price / item.participants.length).toFixed(2)}
+                      คนละ: ฿
+                      {(item.price / item.participants.length).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -781,7 +858,9 @@ export default function Home() {
                       เพิ่มรายการแรก
                     </button>
                   ) : (
-                    <p className="text-gray-500 text-sm">เพิ่มคนก่อนเพื่อเพิ่มรายการ</p>
+                    <p className="text-gray-500 text-sm">
+                      เพิ่มคนก่อนเพื่อเพิ่มรายการ
+                    </p>
                   )}
                 </div>
               )}
@@ -807,8 +886,11 @@ export default function Home() {
 
             {/* Individual Bills */}
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {Object.values(billSummary).map(person => (
-                <div key={person.name} className="glass-dark rounded-lg p-4 card-hover">
+              {Object.values(billSummary).map((person) => (
+                <div
+                  key={person.name}
+                  className="glass-dark rounded-lg p-4 card-hover"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold text-lg">{person.name}</h3>
                     <div className="flex items-center space-x-2">
@@ -816,9 +898,13 @@ export default function Home() {
                         ฿{person.total.toFixed(2)}
                       </span>
                       <button
-                        onClick={() => viewPersonSummary(
-                          Object.keys(billSummary).find(id => billSummary[id].name === person.name) || ''
-                        )}
+                        onClick={() =>
+                          viewPersonSummary(
+                            Object.keys(billSummary).find(
+                              (id) => billSummary[id].name === person.name
+                            ) || ""
+                          )
+                        }
                         className="p-1 rounded-lg btn-primary text-white transition-colors"
                         title="ดูรายละเอียด"
                       >
@@ -826,12 +912,14 @@ export default function Home() {
                       </button>
                     </div>
                   </div>
-                  
+
                   {person.items.length > 0 && (
                     <div className="text-xs space-y-1 text-gray-300">
                       {person.items.slice(0, 3).map((item, index) => (
                         <div key={index} className="flex justify-between">
-                          <span>{item.name} (หาร {item.sharedWith} คน)</span>
+                          <span>
+                            {item.name} (หาร {item.sharedWith} คน)
+                          </span>
                           <span>฿{item.price.toFixed(2)}</span>
                         </div>
                       ))}
@@ -849,19 +937,23 @@ export default function Home() {
                 <div className="text-center py-8 text-gray-400">
                   <Calculator className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>ยังไม่มีข้อมูลสรุป</p>
-                  <p className="text-sm">เพิ่มคนและรายการแล้วจะมีสรุปค่าใช้จ่ายแสดงที่นี่</p>
+                  <p className="text-sm">
+                    เพิ่มคนและรายการแล้วจะมีสรุปค่าใช้จ่ายแสดงที่นี่
+                  </p>
                 </div>
               ) : (
                 <div className="pt-4 border-t border-white/20">
                   <button
                     onClick={() => {
                       const summary = Object.values(billSummary)
-                        .map(p => `${p.name}: ฿${p.total.toFixed(2)}`)
-                        .join('\n');
+                        .map((p) => `${p.name}: ฿${p.total.toFixed(2)}`)
+                        .join("\n");
                       navigator.clipboard.writeText(
-                        `One&Done Bill Summary\n\n${summary}\n\nTotal: ฿${totalBill.toFixed(2)}`
+                        `One&Done Bill Summary\n\n${summary}\n\nTotal: ฿${totalBill.toFixed(
+                          2
+                        )}`
                       );
-                      alert('คัดลอกข้อมูลแล้ว!');
+                      alert("คัดลอกข้อมูลแล้ว!");
                     }}
                     className="w-full flex items-center justify-center space-x-2 btn-secondary px-4 py-2 text-white rounded-lg"
                   >
@@ -907,8 +999,12 @@ export default function Home() {
                   <span className="text-blue-400 font-bold">2</span>
                 </div>
                 <div>
-                  <p className="font-medium text-white">ตั้งค่า Host (คนจ่าย)</p>
-                  <p className="text-xs text-gray-400">กดปุ่ม 👑 เพื่อตั้งเป็นคนจ่าย</p>
+                  <p className="font-medium text-white">
+                    ตั้งค่า Host (คนจ่าย)
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    กดปุ่ม 👑 เพื่อตั้งเป็นคนจ่าย
+                  </p>
                 </div>
               </div>
 
@@ -918,7 +1014,9 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="font-medium text-white">เพิ่มรายการอาหาร</p>
-                  <p className="text-xs text-gray-400">เลือกคนที่กินแต่ละรายการ</p>
+                  <p className="text-xs text-gray-400">
+                    เลือกคนที่กินแต่ละรายการ
+                  </p>
                 </div>
               </div>
             </div>
@@ -967,8 +1065,12 @@ export default function Home() {
                   <HelpCircle className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold gradient-text">คู่มือการใช้งาน One&Done</h3>
-                  <p className="text-sm text-gray-300">เว็บแบ่งจ่ายค่าอาหารและเครื่องดื่ม</p>
+                  <h3 className="text-xl font-bold gradient-text">
+                    คู่มือการใช้งาน One&Done
+                  </h3>
+                  <p className="text-sm text-gray-300">
+                    เว็บแบ่งจ่ายค่าอาหารและเครื่องดื่ม
+                  </p>
                 </div>
               </div>
               <button
@@ -982,28 +1084,36 @@ export default function Home() {
             <div className="space-y-6 text-gray-300">
               {/* Quick Start */}
               <div>
-                <h4 className="text-lg font-semibold mb-3 text-yellow-400">⚡ เริ่มต้นอย่างรวดเร็ว</h4>
+                <h4 className="text-lg font-semibold mb-3 text-yellow-400">
+                  ⚡ เริ่มต้นอย่างรวดเร็ว
+                </h4>
                 <div className="glass-dark rounded-lg p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="text-center">
                       <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
                         <Users className="w-6 h-6 text-emerald-400" />
                       </div>
-                      <h5 className="font-semibold text-emerald-400 mb-1">เพิ่มคน</h5>
+                      <h5 className="font-semibold text-emerald-400 mb-1">
+                        เพิ่มคน
+                      </h5>
                       <p className="text-xs">เพิ่มชื่อทุกคนในกลุ่ม</p>
                     </div>
                     <div className="text-center">
                       <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
                         <Crown className="w-6 h-6 text-yellow-400" />
                       </div>
-                      <h5 className="font-semibold text-yellow-400 mb-1">ตั้ง Host</h5>
+                      <h5 className="font-semibold text-yellow-400 mb-1">
+                        ตั้ง Host
+                      </h5>
                       <p className="text-xs">กำหนดคนที่จ่ายเงิน</p>
                     </div>
                     <div className="text-center">
                       <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
                         <Receipt className="w-6 h-6 text-blue-400" />
                       </div>
-                      <h5 className="font-semibold text-blue-400 mb-1">เพิ่มอาหาร</h5>
+                      <h5 className="font-semibold text-blue-400 mb-1">
+                        เพิ่มอาหาร
+                      </h5>
                       <p className="text-xs">บันทึกรายการและราคา</p>
                     </div>
                   </div>
@@ -1011,36 +1121,49 @@ export default function Home() {
               </div>
               {/* About Section */}
               <div>
-                <h4 className="text-lg font-semibold mb-3 text-emerald-400">📋 เกี่ยวกับ One&Done</h4>
+                <h4 className="text-lg font-semibold mb-3 text-emerald-400">
+                  📋 เกี่ยวกับ One&Done
+                </h4>
                 <div className="glass-dark rounded-lg p-4">
                   <p className="mb-2">
-                    <strong className="text-white">One&Done</strong> เป็นเว็บแอปสำหรับแบ่งจ่ายค่าอาหารและเครื่องดื่มเมื่อไปสังสรรค์กับเพื่อน
+                    <strong className="text-white">One&Done</strong>{" "}
+                    เป็นเว็บแอปสำหรับแบ่งจ่ายค่าอาหารและเครื่องดื่มเมื่อไปสังสรรค์กับเพื่อน
                   </p>
                   <p className="mb-2">
-                    🎯 <strong className="text-emerald-400">เหมาะสำหรับ:</strong> คนที่จ่ายเงินให้ทั้งหมดก่อน แล้วต้องการให้เพื่อนจ่ายเงินคืน
+                    🎯{" "}
+                    <strong className="text-emerald-400">เหมาะสำหรับ:</strong>{" "}
+                    คนที่จ่ายเงินให้ทั้งหมดก่อน แล้วต้องการให้เพื่อนจ่ายเงินคืน
                   </p>
                   <p>
-                    ✨ <strong className="text-blue-400">จุดเด่น:</strong> คำนวณการแบ่งจ่ายแบบยุติธรรม - ใครกินอะไรจ่ายแค่นั้น
+                    ✨ <strong className="text-blue-400">จุดเด่น:</strong>{" "}
+                    คำนวณการแบ่งจ่ายแบบยุติธรรม - ใครกินอะไรจ่ายแค่นั้น
                   </p>
                 </div>
               </div>
 
               {/* How to Use */}
               <div>
-                <h4 className="text-lg font-semibold mb-3 text-blue-400">🚀 วิธีการใช้งาน</h4>
+                <h4 className="text-lg font-semibold mb-3 text-blue-400">
+                  🚀 วิธีการใช้งาน
+                </h4>
                 <div className="space-y-4">
-                  
                   <div className="glass-dark rounded-lg p-4 border-l-4 border-emerald-500">
-                    <h5 className="font-semibold text-emerald-400 mb-2">ขั้นตอนที่ 1: จัดการคนในปาร์ตี้</h5>
+                    <h5 className="font-semibold text-emerald-400 mb-2">
+                      ขั้นตอนที่ 1: จัดการคนในปาร์ตี้
+                    </h5>
                     <ul className="text-sm space-y-1">
                       <li>• เพิ่มชื่อคนในกลุ่ม (รวมตัวคุณเองด้วย)</li>
                       <li>• กดปุ่ม 👑 เพื่อตั้งตัวเองเป็น "คนจ่าย" (Host)</li>
-                      <li>• ตั้งค่าวิธีการรับเงิน (QR Code, PromptPay, เลขบัญชี)</li>
+                      <li>
+                        • ตั้งค่าวิธีการรับเงิน (QR Code, PromptPay, เลขบัญชี)
+                      </li>
                     </ul>
                   </div>
 
                   <div className="glass-dark rounded-lg p-4 border-l-4 border-blue-500">
-                    <h5 className="font-semibold text-blue-400 mb-2">ขั้นตอนที่ 2: เพิ่มรายการอาหาร</h5>
+                    <h5 className="font-semibold text-blue-400 mb-2">
+                      ขั้นตอนที่ 2: เพิ่มรายการอาหาร
+                    </h5>
                     <ul className="text-sm space-y-1">
                       <li>• ใส่ชื่ออาหารและราคา</li>
                       <li>• เลือกคนที่กินอาหารนั้น</li>
@@ -1050,7 +1173,9 @@ export default function Home() {
                   </div>
 
                   <div className="glass-dark rounded-lg p-4 border-l-4 border-purple-500">
-                    <h5 className="font-semibold text-purple-400 mb-2">ขั้นตอนที่ 3: ดูสรุปและรับเงิน</h5>
+                    <h5 className="font-semibold text-purple-400 mb-2">
+                      ขั้นตอนที่ 3: ดูสรุปและรับเงิน
+                    </h5>
                     <ul className="text-sm space-y-1">
                       <li>• ดูสรุปการหารในส่วน "สรุปการหาร"</li>
                       <li>• กดปุ่ม 👁️ เพื่อดูรายละเอียดแต่ละคน</li>
@@ -1096,17 +1221,22 @@ export default function Home() {
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { type: 'qrcode', label: 'QR Code', icon: QrCode },
-                    { type: 'promptpay', label: 'PromptPay', icon: Smartphone },
-                    { type: 'bank', label: 'Bank Account', icon: Building2 }
+                    { type: "qrcode", label: "QR Code", icon: QrCode },
+                    { type: "promptpay", label: "PromptPay", icon: Smartphone },
+                    { type: "bank", label: "Bank Account", icon: Building2 },
                   ].map(({ type, label, icon: Icon }) => (
                     <button
                       key={type}
-                      onClick={() => setHostPaymentMethod({ ...hostPaymentMethod, type: type as any })}
+                      onClick={() =>
+                        setHostPaymentMethod({
+                          ...hostPaymentMethod,
+                          type: type as any,
+                        })
+                      }
                       className={`p-3 rounded-lg border transition-colors flex flex-col items-center space-y-1 ${
                         hostPaymentMethod.type === type
-                          ? 'bg-blue-500 text-white border-blue-500'
-                          : 'glass-dark border-white/20 hover:bg-white/10'
+                          ? "bg-blue-500 text-white border-blue-500"
+                          : "glass-dark border-white/20 hover:bg-white/10"
                       }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -1136,12 +1266,12 @@ export default function Home() {
                     <Upload className="w-5 h-5" />
                     <span>เลือกรูปภาพ</span>
                   </label>
-                  
+
                   {hostPaymentMethod.image && (
                     <div className="mt-2">
-                      <img 
-                        src={hostPaymentMethod.image} 
-                        alt="Payment method preview" 
+                      <img
+                        src={hostPaymentMethod.image}
+                        alt="Payment method preview"
                         className="w-full max-w-xs mx-auto rounded-lg border border-white/20"
                       />
                     </div>
@@ -1156,7 +1286,12 @@ export default function Home() {
                 </label>
                 <textarea
                   value={hostPaymentMethod.details}
-                  onChange={(e) => setHostPaymentMethod({ ...hostPaymentMethod, details: e.target.value })}
+                  onChange={(e) =>
+                    setHostPaymentMethod({
+                      ...hostPaymentMethod,
+                      details: e.target.value,
+                    })
+                  }
                   placeholder="เช่น: เลขบัญชี 123-456-7890, PromptPay 081-234-5678"
                   className="w-full px-3 py-2 rounded-lg border border-white/20 glass-dark text-white placeholder-gray-400"
                   rows={3}
@@ -1172,7 +1307,9 @@ export default function Home() {
                 </button>
                 <button
                   onClick={updateHostPaymentMethod}
-                  disabled={!hostPaymentMethod.image && !hostPaymentMethod.details}
+                  disabled={
+                    !hostPaymentMethod.image && !hostPaymentMethod.details
+                  }
                   className="flex-1 px-4 py-2 btn-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   บันทึก
