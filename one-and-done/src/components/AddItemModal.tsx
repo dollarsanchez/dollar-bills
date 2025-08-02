@@ -115,7 +115,7 @@ export default function AddItemModal({ isOpen, onClose, onAdd, people, editItem 
               <div className="flex items-center justify-between mb-3">
                 <label className="flex items-center space-x-2 text-sm font-medium text-gray-300">
                   <Users className="w-4 h-4" />
-                  <span>ใครจ่าย? ({selectedParticipants.length} คน)</span>
+                  <span>ใครมีส่วนร่วมบ้าง? ({selectedParticipants.length} คน)</span>
                 </label>
                 <div className="flex space-x-2">
                   <button
