@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'AfterParty - Smart Bill Splitter',
+  title: 'Divvy - Smart Bill Splitter',
   description: 'แชร์ค่าใช้จ่ายอย่างชาญฉลาด ไม่มีทะเลาะกัน',
   keywords: 'bill splitter, แชร์บิล, หารค่าใช้จ่าย, คิดเงิน',
-  authors: [{ name: 'AfterParty Team' }],
+  authors: [{ name: 'Divvy Team' }],
   viewport: 'width=device-width, initial-scale=1',
 }
 
