@@ -587,7 +587,7 @@ export default function Home() {
                 <Calculator className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold gradient-text">Divvy</h1>
+                <h1 className="text-2xl font-bold gradient-text">DivvyDiff</h1>
                 <p className="text-sm text-gray-300">Bill Splitter Pro</p>
               </div>
             </div>
@@ -949,7 +949,7 @@ export default function Home() {
                         .map((p) => `${p.name}: ฿${p.total.toFixed(2)}`)
                         .join("\n");
                       navigator.clipboard.writeText(
-                        `Divvy Bill Summary\n\n${summary}\n\nTotal: ฿${totalBill.toFixed(
+                        `DivvyDiff Bill Summary\n\n${summary}\n\nTotal: ฿${totalBill.toFixed(
                           2
                         )}`
                       );
@@ -976,7 +976,7 @@ export default function Home() {
                 <span className="text-2xl">👋</span>
               </div>
               <h2 className="text-2xl font-bold gradient-text mb-2">
-                ยินดีต้อนรับสู่ Divvy!
+                ยินดีต้อนรับสู่ DivvyDiff!
               </h2>
               <p className="text-gray-300">
                 เว็บแบ่งจ่ายค่าอาหารและเครื่องดื่มแบบยุติธรรม
@@ -1066,7 +1066,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold gradient-text">
-                    คู่มือการใช้งาน Divvy
+                    คู่มือการใช้งาน DivvyDiff
                   </h3>
                   <p className="text-sm text-gray-300">
                     เว็บแบ่งจ่ายค่าอาหารและเครื่องดื่ม
@@ -1122,11 +1122,11 @@ export default function Home() {
               {/* About Section */}
               <div>
                 <h4 className="text-lg font-semibold mb-3 text-emerald-400">
-                  📋 เกี่ยวกับ Divvy
+                  📋 เกี่ยวกับ DivvyDiff
                 </h4>
                 <div className="glass-dark rounded-lg p-4">
                   <p className="mb-2">
-                    <strong className="text-white">Divvy</strong>{" "}
+                    <strong className="text-white">DivvyDiff</strong>{" "}
                     เป็นเว็บแอปสำหรับแบ่งจ่ายค่าอาหารและเครื่องดื่มเมื่อไปสังสรรค์กับเพื่อน
                   </p>
                   <p className="mb-2">
