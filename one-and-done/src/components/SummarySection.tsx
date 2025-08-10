@@ -20,7 +20,7 @@ const SummarySection: React.FC<SummarySectionProps> = ({ people, items }) => {
 
   // คัดลอกข้อความสรุปไปยัง clipboard
   const handleCopyText = async () => {
-    let text = "🧾 One&Done - สรุปค่าใช้จ่าย\n\n";
+    let text = "🧾 AfterParty - สรุปค่าใช้จ่าย\n\n";
     text += `💰 ยอดรวมทั้งหมด: ${formatCurrency(totalAmount)}\n\n`;
 
     summary.forEach((person) => {
