@@ -352,7 +352,7 @@ export default function Home() {
               </button>
               <div className="text-center">
                 <h1 className="text-xl font-bold gradient-text">สรุปการจ่าย</h1>
-                <p className="text-sm text-gray-300">{person?.name}</p>
+                <p className="text-xl text-gray-300">{person?.name}</p>
               </div>
               <div className="w-16"></div>
             </div>
